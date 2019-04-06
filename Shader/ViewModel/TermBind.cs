@@ -86,14 +86,14 @@ namespace Terminal.ViewModel
         Thread flickerThread;
         Task writeThread;
         public static object writeLock = new object();
-        private static BlockingCollection<Task> TaskQ { get; set; }
+        private static BlockingCollection<Task> BlockingCollection { get; set; }
 
         public TermBind()
         {
             flickerThread = new Thread(FlickerThread);
             flickerThread.IsBackground = true;
             flickerThread.Start();
-            TaskQ = new BlockingCollection<Task>(1);
+            BlockingCollection = new BlockingCollection<Task>(1);
 
             Uri soundPath =  new Uri(AppDomain.CurrentDomain.BaseDirectory + "Sounds/whirr.mp3", UriKind.RelativeOrAbsolute);
             BackgroundPlayer.MediaFailed += (o, args) =>
@@ -256,28 +256,28 @@ namespace Terminal.ViewModel
         public void WriteToDisp(string stringIn)
         {
             Task curTask = new Task(() => WriteThread(stringIn));
-            TaskQ.Add(curTask);
+            BlockingCollection.Add(curTask);
             curTask.Start();
         }
 
         public void WriteToDisp(string stringIn, int waitTime)
         {
             Task curTask = new Task(() => WriteThread(stringIn, waitTime));
-            TaskQ.Add(curTask);
+            BlockingCollection.Add(curTask);
             curTask.Start();
         }
 
         public void Wait(int waitTime)
         {
             Task curTask = new Task(() => WaitThread(waitTime));
-            TaskQ.Add(curTask);
+            BlockingCollection.Add(curTask);
             curTask.Start();
         }
 
         public void ClearScroll(TextBox box)
         {
             Task curTask = new Task(() => ClearThread(box));
-            TaskQ.Add(curTask);
+            BlockingCollection.Add(curTask);
             curTask.Start();
         }
         #endregion

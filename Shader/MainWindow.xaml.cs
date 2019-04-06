@@ -85,7 +85,7 @@ namespace Terminal
         {
             switch (e.Key)
             {
-              /*  case Key.D1:
+                case Key.D1:
                     if (ToneGrid.Effect == null)
                     {
                         ToneGrid.Effect = new ColorToneEffect();
@@ -124,7 +124,7 @@ namespace Terminal
                 case Key.D8:
                     ((BloomEffect)BloomGrid.Effect).BaseIntensity--;
                     //     ((PixelateEffect)BloomGrid.Effect);
-                    break;*/
+                    break;
                 case Key.Return:
                     EntSound.Play();
                     string upperText = ((TermBind)DataContext).DispText.ToUpper();
