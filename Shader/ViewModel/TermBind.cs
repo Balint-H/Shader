@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -79,20 +80,20 @@ namespace Terminal.ViewModel
         public MediaPlayer BackgroundPlayer = new MediaPlayer();
         public SoundPlayer player = new SoundPlayer(AppDomain.CurrentDomain.BaseDirectory + "Sounds/print2.wav");
 
-
-
         public List<Cell> Cells { get; } =
         Enumerable.Range(0, 1024).Select(i => new Cell()).ToList();
 
         Thread flickerThread;
         Task writeThread;
         public static object writeLock = new object();
+        private static BlockingCollection<Task> TaskQ { get; set; }
 
         public TermBind()
         {
             flickerThread = new Thread(FlickerThread);
             flickerThread.IsBackground = true;
             flickerThread.Start();
+            TaskQ = new BlockingCollection<Task>(1);
 
             Uri soundPath =  new Uri(AppDomain.CurrentDomain.BaseDirectory + "Sounds/whirr.mp3", UriKind.RelativeOrAbsolute);
             BackgroundPlayer.MediaFailed += (o, args) =>
@@ -254,30 +255,30 @@ namespace Terminal.ViewModel
         #region Write Functions
         public void WriteToDisp(string stringIn)
         {
-            writeThread = new Task(() => WriteThread(stringIn));
-            //writeThread.IsBackground = true;
-            writeThread.Start();
+            Task curTask = new Task(() => WriteThread(stringIn));
+            TaskQ.Add(curTask);
+            curTask.Start();
         }
 
         public void WriteToDisp(string stringIn, int waitTime)
         {
-            writeThread = new Task(() => WriteThread(stringIn, waitTime));
-            //writeThread.IsBackground = true;
-            writeThread.Start();
+            Task curTask = new Task(() => WriteThread(stringIn, waitTime));
+            TaskQ.Add(curTask);
+            curTask.Start();
         }
 
         public void Wait(int waitTime)
         {
-            writeThread = new Task(() => WaitThread(waitTime));
-           // writeThread.IsBackground = true;
-            writeThread.Start();
+            Task curTask = new Task(() => WaitThread(waitTime));
+            TaskQ.Add(curTask);
+            curTask.Start();
         }
 
         public void ClearScroll(TextBox box)
         {
-            writeThread = new Task(() => ClearThread(box));
-           // writeThread.IsBackground = true;
-            writeThread.Start();
+            Task curTask = new Task(() => ClearThread(box));
+            TaskQ.Add(curTask);
+            curTask.Start();
         }
         #endregion
 
