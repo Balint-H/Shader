@@ -86,10 +86,12 @@ namespace Terminal.ViewModel
 
         Thread flickerThread;
         Thread writeThread;
-        public static object writeLock = new object();
+        //private static object writeLock = new object();
+        private static Semaphore _pool;
 
         public TermBind()
         {
+            _pool = new Semaphore(1, 1);
             flickerThread = new Thread(FlickerThread);
             flickerThread.IsBackground = true;
             flickerThread.Start();
@@ -116,8 +118,7 @@ namespace Terminal.ViewModel
         #region Thread Functions
         public void WriteThread(string stringIn)
         {
-            lock (writeLock)
-            {
+                _pool.WaitOne();
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
@@ -146,94 +147,92 @@ namespace Terminal.ViewModel
                     ((MainWindow)App.Current.MainWindow).Scroll();
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
                 });
-            }
+            _pool.Release();
         }
 
         public void WriteThread(string stringIn, int waitTime)
         {
-            lock (writeLock)
+            _pool.WaitOne();
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
+                ((MainWindow)App.Current.MainWindow).ToggleScroll();
+            });
+
+            for (int i = 0; i < stringIn.Length; i++)
+            {
+                DispText += stringIn[i];
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)App.Current.MainWindow).ToggleScroll();
-                });
-
-                for (int i = 0; i < stringIn.Length; i++)
-                {
-                    DispText += stringIn[i];
-                    Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)App.Current.MainWindow).Scroll();
-                    });
-                    Thread.Sleep(waitTime);
-                }
-
-                Thread.Sleep(50);
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    DispText += "\n>";
                     ((MainWindow)App.Current.MainWindow).Scroll();
-                    ((MainWindow)App.Current.MainWindow).ToggleScroll();
                 });
+                Thread.Sleep(waitTime);
             }
+
+            Thread.Sleep(50);
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                DispText += "\n>";
+                ((MainWindow)App.Current.MainWindow).Scroll();
+                ((MainWindow)App.Current.MainWindow).ToggleScroll();
+            });
+            _pool.Release();
         }
 
         public void WaitThread(int waitTime)
         {
-            lock (writeLock)
+            _pool.WaitOne();
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    ((MainWindow)App.Current.MainWindow).ToggleScroll();
-                });
+                ((MainWindow)App.Current.MainWindow).ToggleScroll();
+            });
 
 
-                Thread.Sleep(waitTime);
+            Thread.Sleep(waitTime);
 
 
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    ((MainWindow)App.Current.MainWindow).Scroll();
-                    ((MainWindow)App.Current.MainWindow).ToggleScroll();
-                });
-            }
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ((MainWindow)App.Current.MainWindow).Scroll();
+                ((MainWindow)App.Current.MainWindow).ToggleScroll();
+            });
+            _pool.Release();
         }
+
 
         public void ClearThread(TextBox box)
         {
-            lock (writeLock)
+            _pool.WaitOne(0);
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
+                ((MainWindow)App.Current.MainWindow).ToggleScroll();
+            });
+
+            double lineNumber=5;
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                lineNumber = (box.ActualHeight / box.FontSize) + 5;
+            });
+
+            Thread.Sleep(200);
+
+            for (int i = 0; i < (int)lineNumber; i++)
+            {
+                DispText += "\n";
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)App.Current.MainWindow).ToggleScroll();
+                    ((MainWindow)App.Current.MainWindow).Scroll();
                 });
-
-                double lineNumber=5;
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                   lineNumber = (box.ActualHeight / box.FontSize) + 5;
-                });
-
-                Thread.Sleep(200);
-
-                for (int i = 0; i < (int)lineNumber; i++)
-                {
-                    DispText += "\n";
-                    Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)App.Current.MainWindow).Scroll();
-                    });
-                    Thread.Sleep(100);
-                }
+                Thread.Sleep(100);
             }
-
 
             Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         ((MainWindow)App.Current.MainWindow).Scroll();
                         ((MainWindow)App.Current.MainWindow).ToggleScroll();
                     });
+            _pool.Release();
         }
+
 
         public void FlickerThread()
         {
@@ -254,6 +253,7 @@ namespace Terminal.ViewModel
         #region Write Functions
         public void WriteToDisp(string stringIn)
         {
+            _pool.WaitOne(0);
             writeThread = new Thread(() => WriteThread(stringIn));
             writeThread.IsBackground = true;
             writeThread.Start();
@@ -261,6 +261,7 @@ namespace Terminal.ViewModel
 
         public void WriteToDisp(string stringIn, int waitTime)
         {
+            _pool.WaitOne(0);
             writeThread = new Thread(() => WriteThread(stringIn, waitTime));
             writeThread.IsBackground = true;
             writeThread.Start();
@@ -268,6 +269,7 @@ namespace Terminal.ViewModel
 
         public void Wait(int waitTime)
         {
+            _pool.WaitOne(0);
             writeThread = new Thread(() => WaitThread(waitTime));
             writeThread.IsBackground = true;
             writeThread.Start();
@@ -275,6 +277,7 @@ namespace Terminal.ViewModel
 
         public void ClearScroll(TextBox box)
         {
+            _pool.WaitOne(0);
             writeThread = new Thread(() => ClearThread(box));
             writeThread.IsBackground = true;
             writeThread.Start();
