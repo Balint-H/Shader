@@ -1,0 +1,199 @@
+﻿<Window x:Class="Terminal.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Terminal"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Height="350"
+        Width="525"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        WindowState="Maximized"
+        Foreground="LimeGreen"
+        Background="Transparent"
+        FontFamily="Courier New"
+        FontSize='30'>
+
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  </Window.Resources>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition Width="2.5*" />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="0.8*" />
+      <RowDefinition Height="5.3*" />
+      <RowDefinition Height="1.4*" />
+    </Grid.RowDefinitions>
+    
+    <Rectangle Fill="Black"
+               Grid.ColumnSpan="3"
+               Grid.RowSpan="3" />
+    
+    <Grid Name='Scan'
+           VerticalAlignment='Stretch'
+          HorizontalAlignment='Stretch'
+           Grid.Column='1'
+           Grid.Row='1'        >
+      <Rectangle Fill='#05FFFFFF' />
+      <Image Source='Images/white.png'
+           VerticalAlignment='Top'
+           HorizontalAlignment='Stretch'>
+      <Image.RenderTransform>
+        <TranslateTransform x:Name="AnimatedTranslateTransform" />
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="Image.Loaded">
+          <EventTrigger.Actions>
+            <BeginStoryboard>
+              <BeginStoryboard.Storyboard>
+                <Storyboard  RepeatBehavior='Forever'>
+                  <DoubleAnimation From='-79'
+                                   To='700'
+                                   Duration="0:0:4"
+                                   Storyboard.TargetProperty='(Image.RenderTransform).(TranslateTransform.Y)' />
+                  <DoubleAnimation By="0"
+                                   Duration="0:0:10"
+                                   Storyboard.TargetProperty='(Image.RenderTransform).(TranslateTransform.Y)' />
+                </Storyboard>
+              </BeginStoryboard.Storyboard>
+            </BeginStoryboard>
+          </EventTrigger.Actions>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image></Grid>
+    
+    <Grid x:Name="Disp"
+          Grid.Column="1"
+          Grid.Row="1">
+      
+      <Grid x:Name='BloomGrid'>
+        <Grid x:Name='ToneGrid'>
+          <Grid x:Name='PixelGrid'>
+
+            
+
+            <DockPanel x:Name='AllText'
+                       Margin="20,40,20,40">
+              <DockPanel.Effect>
+                <DropShadowEffect ShadowDepth="4"
+                                  Direction="{Binding ShadowAngle}"
+                                  Color="LimeGreen"
+                                  Opacity="0.6"
+                                  BlurRadius="4" />
+              </DockPanel.Effect>
+              <Border DockPanel.Dock='Top'
+                      BorderBrush='LimeGreen'
+                      Background='Transparent'
+                      BorderThickness='0, 0, 0, 3'
+                      HorizontalAlignment='Stretch'>
+                <DockPanel>
+                  <TextBlock Text='Synapse System v3.4'
+                             DockPanel.Dock='Left'
+                             VerticalAlignment='Center' />
+                  <TextBlock x:Name='CellName'
+                             Text='{Binding CurTerm}'
+                             HorizontalAlignment='Right'
+                             VerticalAlignment='Center'
+                             DockPanel.Dock='Right' />
+
+                </DockPanel>
+              </Border>
+
+              <Grid>
+                <Grid x:Name='SnakeGrid'
+                      Grid.Row='0'
+                      Grid.Column='0'
+                      Margin='50 0'>
+                  <Grid.Resources>
+                    <Style x:Key="{x:Type Rectangle}"
+                           TargetType="{x:Type Rectangle}">
+                      <Setter Property='Margin'
+                              Value='1' />
+                      <Setter Property='Fill'
+                              Value='LimeGreen' />
+                      <Setter Property='HorizontalAlignment'
+                              Value='Stretch' />
+                    </Style>
+                  </Grid.Resources>
+                  <ItemsControl ItemsSource="{Binding Cells}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <UniformGrid Columns="32" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Rectangle Margin='1'
+                                   Height='30'
+                                   HorizontalAlignment='Center'
+                                   VerticalAlignment='Stretch'
+                                   Width='10'
+                                   Fill="LimeGreen"
+                                   Visibility="{Binding IsVisible,
+                               Converter={StaticResource BooleanToVisibilityConverter}}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Grid>
+
+                <ScrollViewer HorizontalScrollBarVisibility='Disabled'
+                              VerticalScrollBarVisibility='Hidden'
+                              x:Name="InpScroll">
+                  <TextBlock x:Name='InpBlock'
+                             TextWrapping="Wrap"
+                             FontSize="22"
+                             Foreground='LimeGreen'
+                             HorizontalAlignment="Stretch"
+                             Focusable='False'
+                             Effect='{DynamicResource CrtShadow}'
+                             Text='{Binding DispText, UpdateSourceTrigger=PropertyChanged}' />
+                </ScrollViewer>
+
+                <TextBox TextWrapping="Wrap"
+                         FontSize="22"
+                         Foreground='LimeGreen'
+                         HorizontalAlignment="Stretch"
+                         x:Name="Inp"
+                         FontFamily='Courier New'
+                         CaretBrush='LimeGreen'
+                         Effect='{DynamicResource CrtShadow}'
+                         Text='{Binding DispText, UpdateSourceTrigger=PropertyChanged}'>
+                  <TextBox.Resources>
+                    <Style TargetType="{x:Type TextBox}">
+                      <Setter Property="Template">
+                        <Setter.Value>
+                          <ControlTemplate TargetType="TextBox">
+                            <Border Name="border">
+                              <ScrollViewer x:Name="PART_ContentHost">
+                              </ScrollViewer>
+                            </Border>
+                          </ControlTemplate>
+                        </Setter.Value>
+                      </Setter>
+                    </Style>
+                  </TextBox.Resources>
+                </TextBox>
+
+              </Grid>
+            </DockPanel>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Image Source="Images/grid.png"
+             VerticalAlignment='Stretch'
+             Focusable='False' />
+    </Grid>
+    <Image Source="Images/terminal.PNG"
+           Grid.Column="0"
+           Grid.RowSpan="3"
+           Grid.ColumnSpan="3"
+           Focusable='False' 
+           x:Name='terminalPic'/>
+  </Grid>
+</Window>

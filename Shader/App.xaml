@@ -1,0 +1,16 @@
+﻿<Application x:Class="Terminal.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Terminal"
+             xmlns:vm='clr-namespace:Terminal.ViewModel'
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+    <DropShadowEffect x:Key='CrtShadow'
+                       ShadowDepth="4"
+                      Direction="330"
+                      Color="LimeGreen"
+                      Opacity="0.5"
+                      BlurRadius="4" />
+
+  </Application.Resources>
+</Application>
