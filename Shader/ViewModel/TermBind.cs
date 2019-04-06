@@ -85,7 +85,7 @@ namespace Terminal.ViewModel
         Enumerable.Range(0, 1024).Select(i => new Cell()).ToList();
 
         Thread flickerThread;
-        Thread writeThread;
+        Task writeThread;
         public static object writeLock = new object();
 
         public TermBind()
@@ -254,29 +254,29 @@ namespace Terminal.ViewModel
         #region Write Functions
         public void WriteToDisp(string stringIn)
         {
-            writeThread = new Thread(() => WriteThread(stringIn));
-            writeThread.IsBackground = true;
+            writeThread = new Task(() => WriteThread(stringIn));
+            //writeThread.IsBackground = true;
             writeThread.Start();
         }
 
         public void WriteToDisp(string stringIn, int waitTime)
         {
-            writeThread = new Thread(() => WriteThread(stringIn, waitTime));
-            writeThread.IsBackground = true;
+            writeThread = new Task(() => WriteThread(stringIn, waitTime));
+            //writeThread.IsBackground = true;
             writeThread.Start();
         }
 
         public void Wait(int waitTime)
         {
-            writeThread = new Thread(() => WaitThread(waitTime));
-            writeThread.IsBackground = true;
+            writeThread = new Task(() => WaitThread(waitTime));
+           // writeThread.IsBackground = true;
             writeThread.Start();
         }
 
         public void ClearScroll(TextBox box)
         {
-            writeThread = new Thread(() => ClearThread(box));
-            writeThread.IsBackground = true;
+            writeThread = new Task(() => ClearThread(box));
+           // writeThread.IsBackground = true;
             writeThread.Start();
         }
         #endregion
