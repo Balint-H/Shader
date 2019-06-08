@@ -22,7 +22,7 @@ namespace Terminal.Models
         static Random rnd;
         static int cycles;
         private static int score;
-
+         
         public enum Direction : int
         {
             LEFT = 0,

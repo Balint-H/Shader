@@ -58,6 +58,7 @@
     </ApplicationDefinition>
     <Compile Include="Models\Command.cs" />
     <Compile Include="Models\CommandList.cs" />
+    <Compile Include="Models\PCQueue.cs" />
     <Compile Include="Models\Snake.cs" />
     <Compile Include="Models\TermScreen.cs" />
     <Compile Include="ShaderEffects\BloomEffect.cs" />

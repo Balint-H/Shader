@@ -76,6 +76,7 @@ namespace Terminal.ViewModel
 
         }
 
+        public static PCQueue WriteC = new PCQueue(1);
         public MediaPlayer BackgroundPlayer = new MediaPlayer();
         public SoundPlayer player = new SoundPlayer(AppDomain.CurrentDomain.BaseDirectory + "Sounds/print2.wav");
 
@@ -84,8 +85,13 @@ namespace Terminal.ViewModel
         public List<Cell> Cells { get; } =
         Enumerable.Range(0, 1024).Select(i => new Cell()).ToList();
 
+        internal static void OnWindowClosing(object sender, CancelEventArgs e)
+        {
+            WriteC.Dispose();
+            ((TermBind)((MainWindow)Application.Current.MainWindow).DataContext).BackgroundPlayer.Close();
+        }
+
         Thread flickerThread;
-        Thread writeThread;
         public static object writeLock = new object();
 
         public TermBind()
@@ -116,8 +122,6 @@ namespace Terminal.ViewModel
         #region Thread Functions
         public void WriteThread(string stringIn)
         {
-            lock (writeLock)
-            {
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
@@ -146,13 +150,11 @@ namespace Terminal.ViewModel
                     ((MainWindow)App.Current.MainWindow).Scroll();
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
                 });
-            }
         }
 
         public void WriteThread(string stringIn, int waitTime)
         {
-            lock (writeLock)
-            {
+
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
@@ -175,13 +177,12 @@ namespace Terminal.ViewModel
                     ((MainWindow)App.Current.MainWindow).Scroll();
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
                 });
-            }
+            
         }
 
         public void WaitThread(int waitTime)
         {
-            lock (writeLock)
-            {
+
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
@@ -196,7 +197,7 @@ namespace Terminal.ViewModel
                     ((MainWindow)App.Current.MainWindow).Scroll();
                     ((MainWindow)App.Current.MainWindow).ToggleScroll();
                 });
-            }
+            
         }
 
         public void ClearThread(TextBox box)
@@ -254,30 +255,22 @@ namespace Terminal.ViewModel
         #region Write Functions
         public void WriteToDisp(string stringIn)
         {
-            writeThread = new Thread(() => WriteThread(stringIn));
-            writeThread.IsBackground = true;
-            writeThread.Start();
+            WriteC.EnqueueItem(()=>WriteThread(stringIn));
         }
 
         public void WriteToDisp(string stringIn, int waitTime)
         {
-            writeThread = new Thread(() => WriteThread(stringIn, waitTime));
-            writeThread.IsBackground = true;
-            writeThread.Start();
+            WriteC.EnqueueItem(()=>WriteThread(stringIn, waitTime));
         }
 
         public void Wait(int waitTime)
         {
-            writeThread = new Thread(() => WaitThread(waitTime));
-            writeThread.IsBackground = true;
-            writeThread.Start();
+            WriteC.EnqueueItem(() => WaitThread(waitTime));
         }
 
         public void ClearScroll(TextBox box)
         {
-            writeThread = new Thread(() => ClearThread(box));
-            writeThread.IsBackground = true;
-            writeThread.Start();
+            WriteC.EnqueueItem(() => ClearThread(box));
         }
         #endregion
 

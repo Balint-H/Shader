@@ -39,7 +39,6 @@ namespace Terminal
             PixelGrid.Effect = new PixelateEffect();
             BloomGrid.Effect = new BloomEffect();
             Scan.Effect = new SmoothMagnifyEffect();
-
             ((PixelateEffect)PixelGrid.Effect).HorizontalPixelCounts = 1200;
             ((PixelateEffect)PixelGrid.Effect).VerticalPixelCounts = 800;
             ((SmoothMagnifyEffect)Disp.Effect).InnerRadius -= 0.7;
@@ -49,11 +48,10 @@ namespace Terminal
             ((SmoothMagnifyEffect)Scan.Effect).InnerRadius -= 0.7;
             ((SmoothMagnifyEffect)Scan.Effect).OuterRadius += 0.5;
             ((SmoothMagnifyEffect)Scan.Effect).Magnification -= 0.7;
-
             ((TermBind)DataContext).CurTerm = "Hypothalamic Terminal";
             InpScroll.Visibility = Visibility.Hidden;
-
             Inp.Focus();
+            Closing += TermBind.OnWindowClosing;
             //
             ((TermBind)DataContext).WriteToDisp("\n          ║                      __  ________ __  __\n     ╔═══╝║╚═══╗                 | \\ | |_   _|  \\/  |\n     ╚══╗▒╠═╔══╝                 |  \\| | | | | \\  / | \n   ╔════╩╗║░╠════╗               | . ` | | | | |\\/| | \n   ╚══╗░╔╩╬═╝░╔══╝               | |\\  |_| |_| |  | | \n╔═════╩═╗▒▓░╬═╩═════╗            |_|_\\_|_____|_|__|_| \n╚════╗░╗╚░▓▒╝░░╔════╝            |  _ \\| |  | |/ ____|\n ╔═══╝░╚══╩╗╔╗▒╚═══╗             | |_) | |  | | (___  \n ╚═════╗░▒░╠╝╠═════╝             |  _ <| |  | |\\___ \\ \n     ╔═╝▒░╔╝░╚═╗                 | |_) | |__| |____) |\n     ╚═══╗║╔═══╝                 |____/ \\____/|_____/\n          ║		");
             ((TermBind)DataContext).Wait(2000);
@@ -85,7 +83,7 @@ namespace Terminal
         {
             switch (e.Key)
             {
-              /*  case Key.D1:
+                case Key.D1:
                     if (ToneGrid.Effect == null)
                     {
                         ToneGrid.Effect = new ColorToneEffect();
@@ -124,7 +122,7 @@ namespace Terminal
                 case Key.D8:
                     ((BloomEffect)BloomGrid.Effect).BaseIntensity--;
                     //     ((PixelateEffect)BloomGrid.Effect);
-                    break;*/
+                    break;
                 case Key.Return:
                     EntSound.Play();
                     string upperText = ((TermBind)DataContext).DispText.ToUpper();
