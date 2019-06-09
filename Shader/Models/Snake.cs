@@ -91,30 +91,6 @@ namespace Terminal.Models
 
         static Snake()
         {
-            Score = 0;
-            headPos = new SnakePos(16, 16);
-            SnakeBods = new List<SnakeBod>();
-            SnakeBods.Add(new SnakeBod(16, 16));
-            SnakeLife = 10;
-            snakeWait = 150;
-            SnakeDir = Direction.LEFT;
-            UpdateThread = new Thread(UpdateSnake);
-            UpdateThread.IsBackground = true;
-            rnd = new Random();
-            targetCrumb = new Crumb(0, 0);
-            cycles = 0;
-            crumbLock = new object();
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i, true);
-                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i + 992, true);
-                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i * 32, true);
-                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i * 32 + 31, true);
-                }
-            });
-            UpdateThread.Start();
 
         }
 
@@ -193,38 +169,37 @@ namespace Terminal.Models
             }
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                ((MainWindow)App.Current.MainWindow).GameOver(Score);
+                ((MainWindow)App.Current.MainWindow).GameOver(Score, Games.SNAKE);
             });
         }
 
         static public void Hi()
         {
-            if (SnakeLife < 0)
+            Score = 0;
+            headPos = new SnakePos(16, 16);
+            SnakeBods = new List<SnakeBod>();
+            SnakeBods.Add(new SnakeBod(16, 16));
+            SnakeLife = 10;
+            snakeWait = 150;
+            SnakeDir = Direction.LEFT;
+            UpdateThread = new Thread(UpdateSnake);
+            UpdateThread.IsBackground = true;
+            rnd = new Random();
+            targetCrumb = new Crumb(0, 0);
+            cycles = 0;
+            crumbLock = new object();
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                Score = 0;
-                headPos = new SnakePos(16, 16);
-                SnakeBods = new List<SnakeBod>();
-                SnakeBods.Add(new SnakeBod(16, 16));
-                SnakeLife = 10;
-                snakeWait = 150;
-                SnakeDir = Direction.LEFT;
-                UpdateThread = new Thread(UpdateSnake);
-                UpdateThread.IsBackground = true;
-                rnd = new Random();
-                targetCrumb = new Crumb(0, 0);
-                cycles = 0;
-                Application.Current.Dispatcher.Invoke((Action)delegate
+                for (int i = 0; i < 32; i++)
                 {
-                    for (int i = 0; i < 32; i++)
-                    {
-                        ((MainWindow)App.Current.MainWindow).SetSnakePix(i, true);
-                        ((MainWindow)App.Current.MainWindow).SetSnakePix(i + 992, true);
-                        ((MainWindow)App.Current.MainWindow).SetSnakePix(i * 32, true);
-                        ((MainWindow)App.Current.MainWindow).SetSnakePix(i * 32 + 31, true);
-                    }
-                });
-                UpdateThread.Start();
-            }
+                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i, true);
+                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i + 992, true);
+                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i * 32, true);
+                    ((MainWindow)App.Current.MainWindow).SetSnakePix(i * 32 + 31, true);
+                }
+            });
+            UpdateThread.Start();
+            
         }
     }
 

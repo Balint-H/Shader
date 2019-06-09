@@ -9,7 +9,9 @@
         Height="350"
         Width="525"
         PreviewKeyDown="Window_PreviewKeyDown"
+        KeyUp='Window_KeyUp'
         WindowState="Maximized"
+        WindowStyle='None'
         Foreground="LimeGreen"
         Background="Transparent"
         FontFamily="Courier New"
@@ -141,6 +143,7 @@
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
                 </Grid>
+                <Canvas Name='CurveCanvas' Focusable='False'/>
 
                 <ScrollViewer HorizontalScrollBarVisibility='Disabled'
                               VerticalScrollBarVisibility='Hidden'
@@ -185,15 +188,20 @@
           </Grid>
         </Grid>
       </Grid>
-      <Image Source="Images/grid.png"
-             VerticalAlignment='Stretch'
-             Focusable='False' />
+      <Image Source="Images/grid4.png"
+             Stretch='UniformToFill'
+             Focusable='False'
+             Grid.Column="0"
+             Grid.RowSpan="3"
+             Grid.ColumnSpan="3" />
     </Grid>
+    
     <Image Source="Images/terminal.PNG"
            Grid.Column="0"
            Grid.RowSpan="3"
            Grid.ColumnSpan="3"
            Focusable='False' 
            x:Name='terminalPic'/>
+    
   </Grid>
 </Window>

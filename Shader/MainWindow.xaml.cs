@@ -31,8 +31,11 @@ namespace Terminal
     {
         public CommandList CurList = new CommandList();
         public SoundPlayer EntSound = new SoundPlayer(AppDomain.CurrentDomain.BaseDirectory + "Sounds/enter.wav");
+        public Polyline curveline = new Polyline();
+
         public MainWindow()
         {
+            #region init
             InitializeComponent();
             DataContext = new TermBind();
             Disp.Effect = new SmoothMagnifyEffect();
@@ -49,9 +52,13 @@ namespace Terminal
             ((SmoothMagnifyEffect)Scan.Effect).OuterRadius += 0.5;
             ((SmoothMagnifyEffect)Scan.Effect).Magnification -= 0.7;
             ((TermBind)DataContext).CurTerm = "Hypothalamic Terminal";
+            CurveCanvas.Children.Add(curveline);
+            CurveCanvas.Visibility = Visibility.Hidden;
             InpScroll.Visibility = Visibility.Hidden;
             Inp.Focus();
-            Closing += TermBind.OnWindowClosing;
+            #endregion
+            /*
+            #region intro
             //
             ((TermBind)DataContext).WriteToDisp("\n          ║                      __  ________ __  __\n     ╔═══╝║╚═══╗                 | \\ | |_   _|  \\/  |\n     ╚══╗▒╠═╔══╝                 |  \\| | | | | \\  / | \n   ╔════╩╗║░╠════╗               | . ` | | | | |\\/| | \n   ╚══╗░╔╩╬═╝░╔══╝               | |\\  |_| |_| |  | | \n╔═════╩═╗▒▓░╬═╩═════╗            |_|_\\_|_____|_|__|_| \n╚════╗░╗╚░▓▒╝░░╔════╝            |  _ \\| |  | |/ ____|\n ╔═══╝░╚══╩╗╔╗▒╚═══╗             | |_) | |  | | (___  \n ╚═════╗░▒░╠╝╠═════╝             |  _ <| |  | |\\___ \\ \n     ╔═╝▒░╔╝░╚═╗                 | |_) | |__| |____) |\n     ╚═══╗║╔═══╝                 |____/ \\____/|_____/\n          ║		");
             ((TermBind)DataContext).Wait(2000);
@@ -73,16 +80,18 @@ namespace Terminal
             ((TermBind)DataContext).WriteToDisp("Boot complete");
             ((TermBind)DataContext).Wait(2000);
             ((TermBind)DataContext).ClearScroll(Inp);
-            ((TermBind)DataContext).WriteToDisp(" "); 
-            
-            // ((TermBind)DataContext).WriteToDisp("\n          ║                      __  ________ __  __\n     ╔═══╝║╚═══╗                 | \\ | |_   _|  \\/  |\n     ╚══╗▒╠═╔══╝                 |  \\| | | | | \\  / | \n   ╔════╩╗║░╠════╗               | . ` | | | | |\\/| | \n   ╚══╗░╔╩╬═╝░╔══╝               | |\\  |_| |_| |  | | \n╔═════╩═╗▒▓░╬═╩═════╗            |_|_\\_|_____|_|__|_| \n╚════╗░╗╚░▓▒╝░░╔════╝            |  _ \\| |  | |/ ____|\n ╔═══╝░╚══╩╗╔╗▒╚═══╗             | |_) | |  | | (___  \n ╚═════╗░▒░╠╝╠═════╝             |  _ <| |  | |\\___ \\ \n     ╔═╝▒░╔╝░╚═╗                 | |_) | |__| |____) |\n     ╚═══╗║╔═══╝                 |____/ \\____/|_____/\n          ║		");
+            ((TermBind)DataContext).WriteToDisp(" ");
 
+            // ((TermBind)DataContext).WriteToDisp("\n          ║                      __  ________ __  __\n     ╔═══╝║╚═══╗                 | \\ | |_   _|  \\/  |\n     ╚══╗▒╠═╔══╝                 |  \\| | | | | \\  / | \n   ╔════╩╗║░╠════╗               | . ` | | | | |\\/| | \n   ╚══╗░╔╩╬═╝░╔══╝               | |\\  |_| |_| |  | | \n╔═════╩═╗▒▓░╬═╩═════╗            |_|_\\_|_____|_|__|_| \n╚════╗░╗╚░▓▒╝░░╔════╝            |  _ \\| |  | |/ ____|\n ╔═══╝░╚══╩╗╔╗▒╚═══╗             | |_) | |  | | (___  \n ╚═════╗░▒░╠╝╠═════╝             |  _ <| |  | |\\___ \\ \n     ╔═╝▒░╔╝░╚═╗                 | |_) | |__| |____) |\n     ╚═══╗║╔═══╝                 |____/ \\____/|_____/\n          ║		");
+            #endregion
+    */
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
+                #region effect settings
                 case Key.D1:
                     if (ToneGrid.Effect == null)
                     {
@@ -123,6 +132,8 @@ namespace Terminal
                     ((BloomEffect)BloomGrid.Effect).BaseIntensity--;
                     //     ((PixelateEffect)BloomGrid.Effect);
                     break;
+                #endregion
+
                 case Key.Return:
                     EntSound.Play();
                     string upperText = ((TermBind)DataContext).DispText.ToUpper();
@@ -146,10 +157,14 @@ namespace Terminal
 
                 case Key.Left:
                     if (!TermBind.IsOpen) break;
+                    Curve.rightTurn = false;
+                    Curve.leftTurn = true;
                     Snake.SnakeDir = (Snake.Direction)((int)(++Snake.SnakeDir) % 4);
                     break;
                 case Key.Right:
                     if (!TermBind.IsOpen) break;
+                    Curve.rightTurn = true;
+                    Curve.leftTurn = false;
                     if (Snake.SnakeDir == Snake.Direction.LEFT) Snake.SnakeDir = Snake.Direction.DOWN;
                     else Snake.SnakeDir--;
 
@@ -158,7 +173,18 @@ namespace Terminal
 
         }
 
-
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    Curve.leftTurn = false;
+                    break;
+                case Key.Right:
+                    Curve.rightTurn = false;
+                    break;
+            }
+        }
 
         #region scroll functions
         public void Scroll()
@@ -195,28 +221,93 @@ namespace Terminal
             }
         }
 
-
-        public void GameOver(int score)
+        public void Expand(Point point)
         {
-            SnakeGrid.Visibility = Visibility.Hidden;
-            Inp.Visibility = Visibility.Visible;
-            InpScroll.Visibility = Visibility.Hidden;
-            Inp.Focus();
-            ((TermBind)DataContext).CurTerm = "Hypothalamic Terminal";
+            curveline.Points.Add(point);
+        }
 
-            ((TermBind)DataContext).WriteToDisp("\n\nFinal score of "+Snake.Score.ToString()+"\n\nEnter Name:");
-            Thread nameThread = new Thread(CommandList.CmdName);
-            nameThread.IsBackground = true;
-            nameThread.Start();
+        public void ClearAt(int length)
+        {
+            curveline.Points.RemoveAt(curveline.Points.Count - length);
+        }
+
+        public void ClearCanvas()
+        {
+            CurveCanvas.Children.Clear();
+        }
+
+        public (double, double) GetBoundaries()
+        {
+            
+            return (CurveCanvas.ActualWidth, CurveCanvas.ActualHeight);
+        }
+
+        public void NewLine()
+        {
+            curveline = new Polyline();
+            curveline.Stroke = new SolidColorBrush(Colors.Lime);
+
+            curveline.StrokeThickness = 5;
+
+            curveline.Points = new PointCollection();
+            CurveCanvas.Children.Add(curveline);
+        }
+
+
+        public void GameOver(int score, Games gamein)
+        {
+            switch(gamein)
+            {
+                case Games.SNAKE:
+                    SnakeGrid.Visibility = Visibility.Hidden;
+                    Inp.Visibility = Visibility.Visible;
+                    InpScroll.Visibility = Visibility.Hidden;
+                    Inp.Focus();
+                    ((TermBind)DataContext).CurTerm = "Hypothalamic Terminal";
+
+                    ((TermBind)DataContext).WriteToDisp("\n\nFinal score of " + Snake.Score.ToString() + "\n\nEnter Name:");
+                    Thread nameThread = new Thread(CommandList.CmdName);
+                    nameThread.IsBackground = true;
+                    nameThread.Start();
+                    break;
+                case Games.CURVE:
+                    ClearCanvas();
+                    CurveCanvas.Visibility = Visibility.Hidden;
+                    Inp.Visibility = Visibility.Visible;
+                    InpScroll.Visibility = Visibility.Hidden;
+                    Inp.Focus();
+                    ((TermBind)DataContext).CurTerm = "Hypothalamic Terminal";
+                    TermBind.IsOpen = false;
+                    break;
+            }
+            
 
         }
 
-        public void GameOn()
+        public void GameOn(Games gamein)
         {
-            InpScroll.Visibility = Visibility.Hidden;
-            Inp.Visibility = Visibility.Hidden;
-            SnakeGrid.Visibility = Visibility.Visible;
+            switch (gamein)
+            {
+                case Games.SNAKE:
+                    InpScroll.Visibility = Visibility.Hidden;
+                    Inp.Visibility = Visibility.Hidden;
+                    SnakeGrid.Visibility = Visibility.Visible;
+                    break;
+                case Games.CURVE:
+                    InpScroll.Visibility = Visibility.Hidden;
+                    Inp.Visibility = Visibility.Hidden;
+                    CurveCanvas.Visibility = Visibility.Visible;
+                    break;
+            }
         }
+
+
         #endregion
+    }
+
+    public enum Games: int
+    {
+        SNAKE=1,
+        CURVE=2,
     }
 }

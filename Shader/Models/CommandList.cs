@@ -240,10 +240,10 @@ Enter >START to begin, or >SCORE to see highscores");
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
 
-                        ((MainWindow)Application.Current.MainWindow).GameOn();
+                        ((MainWindow)Application.Current.MainWindow).GameOn(Games.CURVE);
 
                     });
-                    Snake.Hi();
+                    Curve.Hi();
                     break;
                 }
                 if (Command.Arguement == ">SCORE")
@@ -286,7 +286,7 @@ Enter >START to begin, or >SCORE to see highscores");
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
 
-                        ((MainWindow)Application.Current.MainWindow).GameOn();
+                        ((MainWindow)Application.Current.MainWindow).GameOn(Games.SNAKE);
 
                     });
                     Snake.Hi();

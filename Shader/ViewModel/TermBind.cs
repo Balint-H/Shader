@@ -16,7 +16,7 @@ using Terminal.Models;
 
 namespace Terminal.ViewModel
 {
-    class TermBind : INotifyPropertyChanged
+    class TermBind : INotifyPropertyChanged, IDisposable
     {
         static private bool isOpen; //If any view (i.e. SettingsView or HelpView) is visible, this is true
         static public bool IsOpen
@@ -85,12 +85,6 @@ namespace Terminal.ViewModel
         public List<Cell> Cells { get; } =
         Enumerable.Range(0, 1024).Select(i => new Cell()).ToList();
 
-        internal static void OnWindowClosing(object sender, CancelEventArgs e)
-        {
-            WriteC.Dispose();
-            ((TermBind)((MainWindow)Application.Current.MainWindow).DataContext).BackgroundPlayer.Close();
-        }
-
         Thread flickerThread;
         public static object writeLock = new object();
 
@@ -117,6 +111,12 @@ namespace Terminal.ViewModel
         void OnPropertyChanged([CallerMemberName]string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Dispose()
+        {
+            WriteC.Dispose();
+            BackgroundPlayer.Close();
         }
 
         #region Thread Functions
