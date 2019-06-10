@@ -16,8 +16,8 @@ namespace Terminal.Models
     {
         static Point [] headPos;
         static double stepSize;
-        static public bool [] leftTurn;
-        static public bool [] rightTurn;
+        static public bool [] leftTurn = new bool[] { false, false };
+        static public bool [] rightTurn = new bool[] { false, false };
         static double[] curangle;
         static Thread updateThread;
         static bool run;
@@ -39,7 +39,11 @@ namespace Terminal.Models
 
         static public void Hi()
         {
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                (width, height) = ((MainWindow)Application.Current.MainWindow).GetBoundaries();
 
+            });
             headPos = new Point[] { new Point(20, 20), new Point(width - 20, height - 20) };
             stepSize = 2;
             leftTurn = new bool[] { false, false };
@@ -64,23 +68,17 @@ namespace Terminal.Models
         {
             
             int round = 0;
-            
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                (width, height) = ((MainWindow)Application.Current.MainWindow).GetBoundaries();
-
-            });
 
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                ((MainWindow)Application.Current.MainWindow).NewLine();
-                ((MainWindow)Application.Current.MainWindow).Expand(new Point(0, 0));
-                ((MainWindow)Application.Current.MainWindow).Expand(new Point(0, height));
-                ((MainWindow)Application.Current.MainWindow).Expand(new Point(width, height));
-                ((MainWindow)Application.Current.MainWindow).Expand(new Point(width, 0));
-                ((MainWindow)Application.Current.MainWindow).Expand(new Point(0, 0));
-                ((MainWindow)Application.Current.MainWindow).NewLine();
-
+                ((MainWindow)Application.Current.MainWindow).NewLine(0);
+                ((MainWindow)Application.Current.MainWindow).Expand(new Point(0, 0),0);
+                ((MainWindow)Application.Current.MainWindow).Expand(new Point(0, height),0);
+                ((MainWindow)Application.Current.MainWindow).Expand(new Point(width, height),0);
+                ((MainWindow)Application.Current.MainWindow).Expand(new Point(width, 0),0);
+                ((MainWindow)Application.Current.MainWindow).Expand(new Point(0, 0),0);
+                ((MainWindow)Application.Current.MainWindow).NewLine(0);
+                ((MainWindow)Application.Current.MainWindow).NewLine(1);
             });
             Thread.Sleep(1000);
             while (run)
@@ -101,28 +99,40 @@ namespace Terminal.Models
                     {
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)Application.Current.MainWindow).Expand(headPos);
+                            ((MainWindow)Application.Current.MainWindow).Expand(headPos[i], i);
                         });
 
-                        run = !(CollisionUpdate(collision, headPos, curangle, stepSize, prec));
+                        if(CollisionUpdate(collision, headPos[i], curangle[i], stepSize, prec))
+                        {
+                            run = false;
+                            break;
+                        }
                     }
                     else if (round == baselength)
                     {
 
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)Application.Current.MainWindow).NewLine();
-                            ((MainWindow)Application.Current.MainWindow).Expand(headPos);
+                            ((MainWindow)Application.Current.MainWindow).NewLine(i);
+                            ((MainWindow)Application.Current.MainWindow).Expand(headPos[i], i);
                         });
 
-                        run = !(CollisionCheck(collision, headPos, curangle, stepSize, prec));
+                        if(CollisionCheck(collision, headPos[i], curangle[i], stepSize, prec))
+                        {
+                            run = false;
+                            break;
+                        }
                     }
                     else if (round < baselength + dotlength)
                     {
-                        run = !(CollisionCheck(collision, headPos, curangle, stepSize, prec));
+                        if(CollisionCheck(collision, headPos[i], curangle[i], stepSize, prec))
+                        {
+                            run = false;
+                            break;
+                        }
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)Application.Current.MainWindow).Expand(headPos);
+                            ((MainWindow)Application.Current.MainWindow).Expand(headPos[i], i);
                         });
 
                     }
@@ -130,19 +140,27 @@ namespace Terminal.Models
                     {
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)Application.Current.MainWindow).ClearAt(dotlength);
-                            ((MainWindow)Application.Current.MainWindow).Expand(headPos);
+                            ((MainWindow)Application.Current.MainWindow).ClearAt(dotlength, i);
+                            ((MainWindow)Application.Current.MainWindow).Expand(headPos[i], i);
                         });
-                        run = !(CollisionCheck(collision, headPos, curangle, stepSize, prec));
+                        if(CollisionCheck(collision, headPos[i], curangle[i], stepSize, prec))
+                        {
+                            run = false;
+                            break;
+                        }
                     }
                     else if (round < baselength + dotlength + gaplength + dotlength)
                     {
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)Application.Current.MainWindow).ClearAt(dotlength);
-                            ((MainWindow)Application.Current.MainWindow).Expand(headPos);
+                            ((MainWindow)Application.Current.MainWindow).ClearAt(dotlength,i);
+                            ((MainWindow)Application.Current.MainWindow).Expand(headPos[i],i);
                         });
-                        run = !(CollisionUpdate(collision, headPos, curangle, stepSize, prec));
+                        if (CollisionUpdate(collision, headPos[i], curangle[i], stepSize, prec))
+                        {
+                            run = false;
+                            break;
+                        }
                     }
                     else
                     {

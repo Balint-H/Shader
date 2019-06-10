@@ -52,7 +52,8 @@ namespace Terminal
             ((SmoothMagnifyEffect)Scan.Effect).OuterRadius += 0.5;
             ((SmoothMagnifyEffect)Scan.Effect).Magnification -= 0.7;
             ((TermBind)DataContext).CurTerm = "Hypothalamic Terminal";
-            CurveCanvas.Children.Add(curveline);
+            foreach(var line in curveline)
+            CurveCanvas.Children.Add(line);
             CurveCanvas.Visibility = Visibility.Hidden;
             InpScroll.Visibility = Visibility.Hidden;
             Inp.Focus();
@@ -92,6 +93,7 @@ namespace Terminal
             switch (e.Key)
             {
                 #region effect settings
+                /*
                 case Key.D1:
                     if (ToneGrid.Effect == null)
                     {
@@ -132,6 +134,7 @@ namespace Terminal
                     ((BloomEffect)BloomGrid.Effect).BaseIntensity--;
                     //     ((PixelateEffect)BloomGrid.Effect);
                     break;
+                    */
                 #endregion
 
                 case Key.Return:
@@ -157,17 +160,34 @@ namespace Terminal
 
                 case Key.Left:
                     if (!TermBind.IsOpen) break;
-                    Curve.rightTurn = false;
-                    Curve.leftTurn = true;
+                    Curve.rightTurn[0] = false;
+                    Curve.leftTurn[0] = true;
                     Snake.SnakeDir = (Snake.Direction)((int)(++Snake.SnakeDir) % 4);
                     break;
                 case Key.Right:
                     if (!TermBind.IsOpen) break;
-                    Curve.rightTurn = true;
-                    Curve.leftTurn = false;
+                    Curve.rightTurn[0] = true;
+                    Curve.leftTurn[0] = false;
                     if (Snake.SnakeDir == Snake.Direction.LEFT) Snake.SnakeDir = Snake.Direction.DOWN;
                     else Snake.SnakeDir--;
 
+                    break;
+
+                case Key.A:
+                    if (TermBind.IsOpen)
+                    {
+                        Curve.rightTurn[1] = false;
+                        Curve.leftTurn[1] = true;
+                    }
+                    break;
+                case Key.D:
+                    if (TermBind.IsOpen)
+                    {
+                        {
+                            Curve.rightTurn[1] = true;
+                            Curve.leftTurn[1] = false;
+                        }
+                    }
                     break;
             }
 
@@ -178,10 +198,16 @@ namespace Terminal
             switch (e.Key)
             {
                 case Key.Left:
-                    Curve.leftTurn = false;
+                    Curve.leftTurn[0] = false;
                     break;
                 case Key.Right:
-                    Curve.rightTurn = false;
+                    Curve.rightTurn[0] = false;
+                    break;
+                case Key.A:
+                        Curve.leftTurn[1] = false;
+                    break;
+                case Key.D:
+                        Curve.rightTurn[1] = false;
                     break;
             }
         }
@@ -245,7 +271,15 @@ namespace Terminal
         public void NewLine(int i)
         {
             curveline[i] = new Polyline();
-            curveline[i].Stroke = new SolidColorBrush(Colors.Lime);
+            switch(i)
+            {
+                case 0:
+                    curveline[i].Stroke = new SolidColorBrush(Colors.Lime);
+                    break;
+                case 1:
+                    curveline[i].Stroke = new SolidColorBrush(Colors.SpringGreen);
+                    break;
+            }
 
             curveline[i].StrokeThickness = 5;
 
