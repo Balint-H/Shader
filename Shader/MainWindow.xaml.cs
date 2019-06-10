@@ -31,7 +31,7 @@ namespace Terminal
     {
         public CommandList CurList = new CommandList();
         public SoundPlayer EntSound = new SoundPlayer(AppDomain.CurrentDomain.BaseDirectory + "Sounds/enter.wav");
-        public Polyline curveline = new Polyline();
+        public Polyline [] curveline = new Polyline[] { new Polyline(), new Polyline() };
 
         public MainWindow()
         {
@@ -221,14 +221,14 @@ namespace Terminal
             }
         }
 
-        public void Expand(Point point)
+        public void Expand(Point point, int i)
         {
-            curveline.Points.Add(point);
+            curveline[i].Points.Add(point);
         }
 
-        public void ClearAt(int length)
+        public void ClearAt(int length, int i)
         {
-            curveline.Points.RemoveAt(curveline.Points.Count - length);
+            curveline[i].Points.RemoveAt(curveline[i].Points.Count - length);
         }
 
         public void ClearCanvas()
@@ -242,15 +242,15 @@ namespace Terminal
             return (CurveCanvas.ActualWidth, CurveCanvas.ActualHeight);
         }
 
-        public void NewLine()
+        public void NewLine(int i)
         {
-            curveline = new Polyline();
-            curveline.Stroke = new SolidColorBrush(Colors.Lime);
+            curveline[i] = new Polyline();
+            curveline[i].Stroke = new SolidColorBrush(Colors.Lime);
 
-            curveline.StrokeThickness = 5;
+            curveline[i].StrokeThickness = 5;
 
-            curveline.Points = new PointCollection();
-            CurveCanvas.Children.Add(curveline);
+            curveline[i].Points = new PointCollection();
+            CurveCanvas.Children.Add(curveline[i]);
         }
 
 

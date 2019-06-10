@@ -19,7 +19,7 @@ namespace Terminal.Models
 
             // Create and start a separate thread for each worker
             for (int i = 0; i < workerCount; i++)
-                (_workers[i] = new Thread(Consume)).Start();
+                (_workers[i] = new Thread(Consume) { IsBackground = true }).Start();
         }
 
         public void Dispose()

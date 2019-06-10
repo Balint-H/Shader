@@ -13,11 +13,11 @@ namespace Terminal.Models
     {
         public static bool CollisionUpdate(Dictionary<Point, bool> dictIn, Point headIn, double angle, double radius, int prec)
         {
-            long headX = (int)(Math.Round(headIn.X, prec) * Math.Pow(10, prec));
-            long headY = (int)(Math.Round(headIn.Y, prec) * Math.Pow(10, prec));
+            long headX = (int)(Math.Round(headIn.X * Math.Pow(10, prec), prec) );
+            long headY = (int)(Math.Round(headIn.Y * Math.Pow(10, prec), prec) );
 
-            long targetX = (int)(Math.Round(headIn.X + radius * Math.Cos(angle), prec) * Math.Pow(10, prec));
-            long targetY = (int)(Math.Round(headIn.Y + radius * Math.Sin(angle), prec) * Math.Pow(10, prec));
+            long targetX = (int)(Math.Round((headIn.X+ radius * Math.Cos(angle)) * Math.Pow(10, prec), prec) );
+            long targetY = (int)(Math.Round((headIn.Y + radius * Math.Sin(angle)) * Math.Pow(10, prec), prec) );
             Dictionary<Point, bool> Tally = new Dictionary<Point, bool>();
 
             int w = (int)(targetX - headX);

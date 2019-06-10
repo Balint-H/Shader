@@ -235,8 +235,9 @@ Enter >START to begin, or >SCORE to see highscores");
             while (origArg == Command.Arguement) Thread.Sleep(100);
             while (true)
             {
-                if (Command.Arguement == ">START")
+                if (Command.Arguement == ">START1")
                 {
+                    Curve.playerCount = 1;
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
 
@@ -246,7 +247,19 @@ Enter >START to begin, or >SCORE to see highscores");
                     Curve.Hi();
                     break;
                 }
-                if (Command.Arguement == ">SCORE")
+                else if (Command.Arguement == ">START2")
+                {
+                    Curve.playerCount = 2;
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        ((MainWindow)Application.Current.MainWindow).GameOn(Games.CURVE);
+
+                    });
+                    Curve.Hi();
+                    break;
+                }
+                else if (Command.Arguement == ">SCORE")
                 {
                     StringBuilder myScore = new StringBuilder();
                     myScore.Append("\n");

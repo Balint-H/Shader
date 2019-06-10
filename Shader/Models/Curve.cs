@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,11 +14,11 @@ namespace Terminal.Models
 {
     static class Curve
     {
-        static Point headPos;
+        static Point [] headPos;
         static double stepSize;
-        static public bool leftTurn;
-        static public bool rightTurn;
-        static double curangle = 0;
+        static public bool [] leftTurn;
+        static public bool [] rightTurn;
+        static double[] curangle;
         static Thread updateThread;
         static bool run;
         static Dictionary<Point, bool> collision;
@@ -27,6 +28,8 @@ namespace Terminal.Models
         static SolidColorBrush myBrush;
         static double width=0;
         static double height=0;
+        static int prec = 2;
+        public static int playerCount;
 
         static Curve()
         {
@@ -37,13 +40,13 @@ namespace Terminal.Models
         static public void Hi()
         {
 
-            headPos = new Point(20, 20);
+            headPos = new Point[] { new Point(20, 20), new Point(width - 20, height - 20) };
             stepSize = 2;
-            leftTurn = false;
-            rightTurn = false;
+            leftTurn = new bool[] { false, false };
+            rightTurn = new bool[] { false, false };
             run = true;
             collision = new Dictionary<Point, bool>();
-            curangle = 0;
+            curangle = new double[] { 0, Math.PI };
             baselength = 200;
             dotlength = 5;
             gaplength = 20;
@@ -82,15 +85,17 @@ namespace Terminal.Models
             Thread.Sleep(1000);
             while (run)
             {
-                if (leftTurn) curangle -= 0.05;
-                else if (rightTurn) curangle += 0.05;
-                headPos.X += Math.Cos(curangle) * stepSize;
-                headPos.Y += Math.Sin(curangle) * stepSize;
+                for (int i = 0; i < playerCount; i++)
+                {
+                    if (leftTurn[i]) curangle[i] -= 0.05;
+                    else if (rightTurn[i]) curangle[i] += 0.05;
+                    headPos[i].X += Math.Cos(curangle[i]) * stepSize;
+                    headPos[i].Y += Math.Sin(curangle[i]) * stepSize;
 
-                if (headPos.X < 0) break;
-                if (headPos.Y < 0) break;
-                if (headPos.X > width) break;
-                if (headPos.Y > height) break;       
+                    if (headPos[i].X < 0) break;
+                    if (headPos[i].Y < 0) break;
+                    if (headPos[i].X > width) break;
+                    if (headPos[i].Y > height) break;
 
                     if (round < baselength)
                     {
@@ -99,7 +104,7 @@ namespace Terminal.Models
                             ((MainWindow)Application.Current.MainWindow).Expand(headPos);
                         });
 
-                        run = !(CollisionUpdate(collision, headPos, curangle, stepSize, 2));
+                        run = !(CollisionUpdate(collision, headPos, curangle, stepSize, prec));
                     }
                     else if (round == baselength)
                     {
@@ -110,11 +115,11 @@ namespace Terminal.Models
                             ((MainWindow)Application.Current.MainWindow).Expand(headPos);
                         });
 
-                        run= !(CollisionCheck(collision, headPos, curangle, stepSize, 2));
+                        run = !(CollisionCheck(collision, headPos, curangle, stepSize, prec));
                     }
                     else if (round < baselength + dotlength)
                     {
-                        run= !(CollisionCheck(collision, headPos, curangle, stepSize, 2));
+                        run = !(CollisionCheck(collision, headPos, curangle, stepSize, prec));
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
                             ((MainWindow)Application.Current.MainWindow).Expand(headPos);
@@ -128,7 +133,7 @@ namespace Terminal.Models
                             ((MainWindow)Application.Current.MainWindow).ClearAt(dotlength);
                             ((MainWindow)Application.Current.MainWindow).Expand(headPos);
                         });
-                        run =  !(CollisionCheck(collision, headPos, curangle, stepSize, 2));
+                        run = !(CollisionCheck(collision, headPos, curangle, stepSize, prec));
                     }
                     else if (round < baselength + dotlength + gaplength + dotlength)
                     {
@@ -137,15 +142,16 @@ namespace Terminal.Models
                             ((MainWindow)Application.Current.MainWindow).ClearAt(dotlength);
                             ((MainWindow)Application.Current.MainWindow).Expand(headPos);
                         });
-                        run = !(CollisionUpdate(collision, headPos, curangle, stepSize, 2));
+                        run = !(CollisionUpdate(collision, headPos, curangle, stepSize, prec));
                     }
                     else
                     {
                         round = 0;
                     }
-               
+                }
                 Thread.Sleep(20);
                 round++;
+
             }
             Thread.Sleep(1500);
             Application.Current.Dispatcher.Invoke((Action)delegate
